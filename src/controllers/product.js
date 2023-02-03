@@ -2,12 +2,21 @@ const Product = require("../models/product");
 // const User = require("../models/user")
 
 const addProduct = (req, res) => {
-  const product = req.body;
-  const { name, imageURI, description, reviews, price, actualPrice, isAvailible = true } = product;
+  const { product } = req.body;
+  product._id = undefined;
+  product.reviews = JSON.stringify(product.reviews);
 
-  // const newProduct = new Product(product);      
-  // newProduct.save();
   Product.insertMany([product]).then(result => {
+    res.json(result)
+  })
+
+};
+
+const updateProduct = (req, res) => {
+  const { id, product } = req.body;
+  product.reviews = JSON.stringify(product.reviews);
+
+  Product.updateOne({_id: id}, product).then(result => {
     res.json(result)
   })
 
@@ -15,15 +24,20 @@ const addProduct = (req, res) => {
 
 
 const allProducts = (req, res) => {
-  Product.find({}).then(product => {
-    res.json(product)
+  Product.find({}).then(products => {
+    const onlyProducts = JSON.parse(JSON.stringify(products));
+    const resProduct = onlyProducts.map(product => {
+      const parsedReviews = product.reviews ? JSON.parse(product.reviews) : []; 
+      return {...product, reviews: parsedReviews}})
+    res.json(resProduct)
   })
 }
+
 
 const deleteProducts = (req, res) => {
   const filter = req.body;
 
-  Product.remove(filter).then(result => {
+  Product.deleteMany(filter).then(result => {
     res.send(result)
   })
 }
@@ -31,5 +45,6 @@ const deleteProducts = (req, res) => {
 module.exports = {
   addProduct,
   allProducts,
-  deleteProducts
+  deleteProducts,
+  updateProduct
 };

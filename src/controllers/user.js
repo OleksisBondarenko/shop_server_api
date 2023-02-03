@@ -28,7 +28,6 @@ const addUser = (req, res) => {
 
 const checkUser = (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
   //   bcrypt.genSalt(10, (err, salt) =>
   //   bcrypt.hash(password, salt, (err, hashPassword) => {
   //     if (err) throw err;
@@ -41,6 +40,8 @@ const checkUser = (req, res) => {
 
    User.findOne({ $or: [ { name: email }, { email: email  } ], password: password }).then((user) => {
     if (user) {
+      
+
       res.json(user);
     } else {
       res.status(400) 
